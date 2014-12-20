@@ -15,7 +15,7 @@ public class PrisonerBehaviour extends CyclicBehaviour {
 
     @Override
     public void action() {
-        ACLMessage msg = myAgent.blockingReceive();
+        ACLMessage msg = this.myAgent.blockingReceive();
 
         switch (MessageType.valueOf(msg.getContent())) {
             case Situation:
