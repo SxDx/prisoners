@@ -57,7 +57,7 @@ public class Judge extends Player {
 
         @Override
         public void action() {
-            System.out.println("Judge::Action");
+            //System.out.println("Judge::Action");
 
             for (int i = 0; i <= this.judge.getRounds(); i += 1) {
                 //System.out.println("Judge::Action::Round::" + i + "::Start");
@@ -122,6 +122,7 @@ public class Judge extends Player {
             ACLMessage firstMsg = firstPrisonerHistory.get(i);
             ACLMessage secondMsg = secondPrisonerHistory.get(i);
 
+            // Both Prisoners do the same
             if (firstMsg.equals(secondMsg)) {
                 if (MessageType.valueOf(firstMsg.getContent()) == MessageType.Cooperate) {
                     // Both prisoners get 1 year
@@ -135,6 +136,7 @@ public class Judge extends Player {
                 }
             }
 
+            // Prisoners differ
             else {
                 if (MessageType.valueOf(firstMsg.getContent()) == MessageType.Cooperate && MessageType.valueOf(secondMsg.getContent()) == MessageType.Defect) {
                     // Cooperate Prisoner gets 3 years
