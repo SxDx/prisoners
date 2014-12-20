@@ -1,44 +1,49 @@
 package game;
 
 import jade.core.AID;
-import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
-import jade.wrapper.AgentContainer;
 import jade.core.behaviours.*;
-import jade.wrapper.AgentController;
-import jade.wrapper.StaleProxyException;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
 public class Judge extends Player {
-
-    private ArrayList<AgentController> prisoners = new ArrayList<AgentController>();
+    private ArrayList<AID> prisoners = new ArrayList<AID>();
+    private int rounds = 10;
 
     @Override
     protected void setup() {
         super.setup();
-        System.out.println("Setup: Loading Judge");
-        AgentContainer ac = this.getContainerController();
-        Object[] args = new Object[1];
-        try {
-            args[0] = "1";
-            AgentController hans = ac.createNewAgent("Hans", "CooperatePrisoner", args);
 
-            args[0] = "2";
-            AgentController klaus = ac.createNewAgent("Klaus", "DefectPrisoner", args);
-            prisoners.add(hans);
-            prisoners.add(klaus);
+        System.out.println("Judge::Setup::" + this.getName());
+        Object[] args = this.getArguments();
 
-            klaus.start();
-            hans.start();
-        } catch (Exception e) {
-            System.out.println("Error creating Player");
-            e.printStackTrace();
-
+        if (args != null && args.length == 2) {
+            System.out.println("Judge::Setup::Prisoners");
+            prisoners.add(new AID("cooperate", AID.ISLOCALNAME));
+        } else {
+            System.out.println("Judge::Setup::Parameters::Error");
         }
 
         this.addBehaviour(new JudgeBehaviour(this));
+
+        System.out.println("Judge::Setup::Finished");
+    }
+
+    public int getRounds() {
+        return rounds;
+    }
+
+    public void setRounds(int rounds) {
+        this.rounds = rounds;
+    }
+
+    public ArrayList getPrisoners() {
+        return prisoners;
+    }
+
+    public void setPrisoners(ArrayList prisoners) {
+        this.prisoners = prisoners;
     }
 
     private class JudgeBehaviour extends OneShotBehaviour {
@@ -52,17 +57,16 @@ public class Judge extends Player {
 
         @Override
         public void action() {
-            System.out.println("Judge.action");
-            Iterator<AgentController> it = this.judge.prisoners.iterator();
-            while (it.hasNext()) {
-                AgentController prisoner = it.next();
-                AID receiver = null;
-                try {
-                    receiver = new AID(prisoner.getName(), AID.ISLOCALNAME);
-                } catch (Exception e) {
-                    System.out.println("Error getting Receiver for Situation");
+            System.out.println("Judge::Action");
+
+            for (int i = 0; i <= this.judge.getRounds(); i += 1) {
+                System.out.println("Judge::Action::Round::" + i + "::Start");
+                Iterator<AID> iterator = this.judge.getPrisoners().iterator();
+                while (iterator.hasNext())
+                {
+                    AID prisoner = iterator.next();
+                    this.judge.sendSituation(prisoner);
                 }
-                this.judge.sendSituation(receiver);
             }
         }
     }
@@ -70,6 +74,7 @@ public class Judge extends Player {
     private void sendSituation(AID receiver) {
         ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
         msg.addReceiver(receiver);
+        msg.setContent("Situation");
         this.sendMessage(msg);
     }
 }

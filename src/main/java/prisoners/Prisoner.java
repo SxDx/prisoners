@@ -7,12 +7,10 @@ import jade.lang.acl.ACLMessage;
 
 public abstract class Prisoner extends Player implements PrisonerInterface {
 
-    private String strategy;
-
     @Override
     protected void setup() {
         super.setup();
-        System.out.println("Setup: Loading Prisoner " + this.getName() + " with Strategy: " + this.strategy);
+        System.out.println("Prisoner::Setup::"+  this.getName());
     }
 
     @Override
@@ -27,14 +25,5 @@ public abstract class Prisoner extends Player implements PrisonerInterface {
         ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
         msg.setContent("Defect");
         this.sendMessage(msg);
-    }
-
-
-    public String getStrategy() {
-        return strategy;
-    }
-
-    public void setStrategy(String strategy) {
-        this.strategy = strategy;
     }
 }
