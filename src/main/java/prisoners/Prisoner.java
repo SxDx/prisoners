@@ -1,5 +1,6 @@
 package prisoners;
 
+import behaviours.PrisonerBehaviour;
 import game.MessageType;
 import game.Player;
 import interfaces.PrisonerInterface;
@@ -25,6 +26,8 @@ public abstract class Prisoner extends Player implements PrisonerInterface {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        this.addBehaviour(new PrisonerBehaviour(this));
     }
 
     @Override
@@ -49,6 +52,10 @@ public abstract class Prisoner extends Player implements PrisonerInterface {
         super.sendMessage(msg);
     }
 
+    /**
+     * Get the local name of the prisoner, needed for sending messages
+     * @return the local name of the opponent
+     */
     public String getOpponentName() {
         String firstName = this.properties.get("firstPrisonerName").toString();
         String secondName = this.properties.get("secondPrisonerName").toString();

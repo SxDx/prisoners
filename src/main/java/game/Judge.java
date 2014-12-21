@@ -4,24 +4,22 @@ import behaviours.JudgeBehaviour;
 import jade.core.AID;
 import jade.core.ProfileImpl;
 import jade.lang.acl.ACLMessage;
-import jade.core.behaviours.OneShotBehaviour;
 import jade.core.Runtime;
+import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
 
-
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+
 import java.util.*;
 
 public class Judge extends Player {
 
     private int rounds = 10;
     private ContainerController container = Runtime.instance().createAgentContainer(new ProfileImpl());
+    private AgentController firstController = null, secondController = null;
     private HashMap<String, HashMap<Integer, ACLMessage>> history = new HashMap<String, HashMap<Integer, ACLMessage>>();
-    private HashMap<String, String> prisoners = new HashMap<String, String>();
     private Properties properties = new Properties();
 
     @Override
@@ -42,11 +40,16 @@ public class Judge extends Player {
         history.put(this.getSecondPrisonerName(), new HashMap<Integer, ACLMessage>());
 
         try {
-            container.createNewAgent(this.getFirstPrisonerName(), this.getFirstPrisonerClass(), null).start();
-            container.createNewAgent(this.getSecondPrisonerName(), this.getSecondPrisonerClass(), null).start();
+            this.firstController = container.createNewAgent(this.getFirstPrisonerName(), this.getFirstPrisonerClass(), null);
+            this.secondController = container.createNewAgent(this.getSecondPrisonerName(), this.getSecondPrisonerClass(), null);
+
+            this.firstController.start();
+            this.secondController.start();
         } catch (StaleProxyException e) {
             e.printStackTrace();
         }
+
+
         // Wait for agents to start
         this.doWait(1000);
         this.addBehaviour(new JudgeBehaviour(this));
@@ -72,7 +75,7 @@ public class Judge extends Player {
     public int getRounds() {
         return rounds;
     }
-    
+
     public void handleDefect(ACLMessage msg, String prisoner, int round) {
         HashMap<Integer, ACLMessage> prisonerHistory = history.get(prisoner);
         prisonerHistory.put(round, msg);
@@ -99,14 +102,17 @@ public class Judge extends Player {
         HashMap<Integer, ACLMessage> firstPrisonerHistory = this.history.get(this.getFirstPrisonerName());
         HashMap<Integer, ACLMessage> secondPrisonerHistory = this.history.get(this.getSecondPrisonerName());
 
+
         // Calculate years in prisons after n rounds
         for (int i = 0; i < this.getRounds(); i += 1) {
             //System.out.println(firstPrisonerHistory.get(i) + " vs. " + secondPrisonerHistory.get(i));
             ACLMessage firstMsg = firstPrisonerHistory.get(i);
             ACLMessage secondMsg = secondPrisonerHistory.get(i);
 
+            System.out.println(firstMsg.getContent().toString() + " vs " + secondMsg.getContent().toString());
+
             // Both Prisoners do the same
-            if (firstMsg.equals(secondMsg)) {
+            if (firstMsg.getContent().equals(secondMsg.getContent())) {
                 if (MessageType.valueOf(firstMsg.getContent()) == MessageType.Cooperate) {
                     // Both prisoners get 1 year
                     firstPrisonerYears += 1;
@@ -132,5 +138,21 @@ public class Judge extends Player {
 
         System.out.println(this.getFirstPrisonerName() + " Prisoner Years in Prison: " + firstPrisonerYears);
         System.out.println(this.getSecondPrisonerName() + " Prisoner Years in Prison: " + secondPrisonerYears);
+    }
+
+    public void endGame() {
+    /*
+        try {
+            this.firstController.kill();
+            this.secondController.kill();
+            this.container.kill();
+            this.getContainerController().kill();
+            Runtime.instance().shutDown();
+        } catch (StaleProxyException e) {
+            e.printStackTrace();
+        }
+
+        System.exit(0);
+    */
     }
 }

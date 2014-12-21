@@ -49,5 +49,6 @@ public class JudgeBehaviour extends OneShotBehaviour {
         }
 
         this.judge.calculateResults();
+        this.judge.endGame();
     }
 }
