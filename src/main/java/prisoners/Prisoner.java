@@ -6,13 +6,25 @@ import interfaces.PrisonerInterface;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
+
 
 public abstract class Prisoner extends Player implements PrisonerInterface {
+
+    private Properties properties = new Properties();
 
     @Override
     protected void setup() {
         super.setup();
         System.out.println("Prisoner::Setup::" + this.getName());
+
+        try {
+            this.properties.load(new FileInputStream("src/main/resources/prisoners.properties"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -31,7 +43,20 @@ public abstract class Prisoner extends Player implements PrisonerInterface {
 
     @Override
     public void sendMessage(ACLMessage msg) {
+        // Prisoners always send their message to the judge and their opponent
         msg.addReceiver(new AID("judge", AID.ISLOCALNAME));
+        msg.addReceiver(new AID(this.getOpponentName(), AID.ISLOCALNAME));
         super.sendMessage(msg);
+    }
+
+    public String getOpponentName() {
+        String firstName = this.properties.get("firstPrisonerName").toString();
+        String secondName = this.properties.get("secondPrisonerName").toString();
+
+        if (this.getLocalName().equals(firstName)) {
+            return secondName;
+        }
+
+        return firstName;
     }
 }

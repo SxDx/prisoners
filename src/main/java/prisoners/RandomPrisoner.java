@@ -3,7 +3,12 @@ package prisoners;
 import behaviours.PrisonerBehaviour;
 import jade.lang.acl.ACLMessage;
 
-public class CooperatePrisoner extends Prisoner {
+import java.util.Random;
+
+public class RandomPrisoner extends Prisoner {
+
+
+    private Random random = new Random();
 
     @Override
     protected void setup() {
@@ -13,7 +18,13 @@ public class CooperatePrisoner extends Prisoner {
 
     @Override
     public void handleSituation(ACLMessage msg) {
-        this.sendCooperate();
+
+        if (this.getRandom().nextBoolean()) {
+            this.sendCooperate();
+            return;
+        }
+
+        this.sendDefect();
     }
 
     @Override
@@ -24,6 +35,10 @@ public class CooperatePrisoner extends Prisoner {
     @Override
     public void handleDefect(ACLMessage msg) {
         // Do Nothing
+    }
+
+    public Random getRandom() {
+        return random;
     }
 
 }

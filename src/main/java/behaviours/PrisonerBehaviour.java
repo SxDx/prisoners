@@ -1,8 +1,9 @@
-package prisoners;
+package behaviours;
 
 import game.MessageType;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
+import prisoners.Prisoner;
 
 public class PrisonerBehaviour extends CyclicBehaviour {
 

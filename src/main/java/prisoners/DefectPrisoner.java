@@ -1,8 +1,7 @@
 package prisoners;
 
-import jade.core.AID;
+import behaviours.PrisonerBehaviour;
 import jade.lang.acl.ACLMessage;
-
 
 public class DefectPrisoner extends Prisoner {
 
@@ -27,9 +26,4 @@ public class DefectPrisoner extends Prisoner {
         // Do Nothing
     }
 
-    @Override
-    public void sendMessage(ACLMessage msg) {
-        msg.addReceiver(new AID("cooperate", AID.ISLOCALNAME));
-        super.sendMessage(msg);
-    }
 }

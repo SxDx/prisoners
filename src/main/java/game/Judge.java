@@ -1,5 +1,6 @@
 package game;
 
+import behaviours.JudgeBehaviour;
 import jade.core.AID;
 import jade.core.ProfileImpl;
 import jade.lang.acl.ACLMessage;
@@ -53,7 +54,6 @@ public class Judge extends Player {
     }
 
     private String getFirstPrisonerName() {
-
         return this.properties.get("firstPrisonerName").toString();
     }
 
@@ -72,64 +72,20 @@ public class Judge extends Player {
     public int getRounds() {
         return rounds;
     }
-
-    private class JudgeBehaviour extends OneShotBehaviour {
-
-        private Judge judge;
-
-        public JudgeBehaviour(Judge judge) {
-            super(judge);
-            this.judge = judge;
-        }
-
-        @Override
-        public void action() {
-            //System.out.println("Judge::Action");
-
-            for (int i = 0; i <= this.judge.getRounds(); i += 1) {
-                //System.out.println("Judge::Action::Round::" + i + "::Start");
-                this.judge.sendSituation();
-
-                // Save the messages sent by the the two prisoners
-                ArrayList<ACLMessage> messages = new ArrayList<ACLMessage>();
-                messages.add(this.myAgent.blockingReceive());
-                messages.add(this.myAgent.blockingReceive());
-
-                Iterator<ACLMessage> iterator = messages.iterator();
-
-                while (iterator.hasNext()) {
-                    ACLMessage message = iterator.next();
-
-                    switch (MessageType.valueOf(message.getContent())) {
-                        case Situation:
-                            break;
-                        case Defect:
-                            this.judge.handleDefect(message, message.getSender().getLocalName(), i);
-                            break;
-                        case Cooperate:
-                            this.judge.handleCooperate(message, message.getSender().getLocalName(), i);
-                            break;
-                    }
-                }
-            }
-
-            this.judge.calculateResults();
-        }
-    }
-
-    private void handleDefect(ACLMessage msg, String prisoner, int round) {
+    
+    public void handleDefect(ACLMessage msg, String prisoner, int round) {
         HashMap<Integer, ACLMessage> prisonerHistory = history.get(prisoner);
         prisonerHistory.put(round, msg);
         history.put(prisoner, prisonerHistory);
     }
 
-    private void handleCooperate(ACLMessage msg, String prisoner, int round) {
+    public void handleCooperate(ACLMessage msg, String prisoner, int round) {
         HashMap<Integer, ACLMessage> prisonerHistory = history.get(prisoner);
         prisonerHistory.put(round, msg);
         history.put(prisoner, prisonerHistory);
     }
 
-    private void sendSituation() {
+    public void sendSituation() {
         ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
         msg.setContent(MessageType.Situation.toString());
         msg.addReceiver(new AID(this.getFirstPrisonerName(), AID.ISLOCALNAME));
@@ -137,7 +93,7 @@ public class Judge extends Player {
         this.sendMessage(msg);
     }
 
-    private void calculateResults() {
+    public void calculateResults() {
         int firstPrisonerYears = 0;
         int secondPrisonerYears = 0;
         HashMap<Integer, ACLMessage> firstPrisonerHistory = this.history.get(this.getFirstPrisonerName());
