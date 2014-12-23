@@ -55,3 +55,8 @@ build/
 
 # Ignore Gradle GUI config
 gradle-app.setting
+
+# JADE
+APDescription.txt
+MTPs-Main-Container.txt
+
