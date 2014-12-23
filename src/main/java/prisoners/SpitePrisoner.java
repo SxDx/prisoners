@@ -8,16 +8,17 @@ public class SpitePrisoner extends Prisoner {
 
     @Override
     public void handleSituation(ACLMessage msg) {
-        this.sendCooperate();
+        if(!this.opponentHasDefected()) {
+            this.sendCooperate();
+            return;
+        }
+
+        this.sendDefect();
     }
 
     @Override
     public void handleCooperate(ACLMessage msg) {
-        if(!this.opponentHasDefected()) {
-            this.sendCooperate();
-        }
-
-        this.sendDefect();
+        // Do nothing
     }
 
     @Override

@@ -16,7 +16,7 @@ import java.util.*;
 
 public class Judge extends Player {
 
-    private int rounds = 10;
+    private int rounds = 100;
     private ContainerController container = Runtime.instance().createAgentContainer(new ProfileImpl());
     private AgentController firstController = null, secondController = null;
     private HashMap<String, HashMap<Integer, ACLMessage>> history = new HashMap<String, HashMap<Integer, ACLMessage>>();
@@ -109,7 +109,7 @@ public class Judge extends Player {
             ACLMessage firstMsg = firstPrisonerHistory.get(i);
             ACLMessage secondMsg = secondPrisonerHistory.get(i);
 
-            System.out.println(firstMsg.getContent().toString() + " vs " + secondMsg.getContent().toString());
+            //System.out.println(firstMsg.getContent() + " vs " + secondMsg.getContent());
 
             // Both Prisoners do the same
             if (firstMsg.getContent().equals(secondMsg.getContent())) {
@@ -140,19 +140,4 @@ public class Judge extends Player {
         System.out.println(this.getSecondPrisonerName() + " Prisoner Years in Prison: " + secondPrisonerYears);
     }
 
-    public void endGame() {
-    /*
-        try {
-            this.firstController.kill();
-            this.secondController.kill();
-            this.container.kill();
-            this.getContainerController().kill();
-            Runtime.instance().shutDown();
-        } catch (StaleProxyException e) {
-            e.printStackTrace();
-        }
-
-        System.exit(0);
-    */
-    }
 }
